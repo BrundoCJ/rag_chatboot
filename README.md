@@ -1,95 +1,181 @@
-# RAG Chatbot
+# DocMind AI — Converse com seus Documentos
 
-Full-stack RAG (Retrieval-Augmented Generation) Chatbot com React, tRPC, SQLite e IA.
+**DocMind AI** é uma aplicação full-stack de chatbot com RAG (Retrieval-Augmented Generation) que permite fazer perguntas em linguagem natural sobre arquivos PDF. A IA busca os trechos mais relevantes do documento e gera respostas precisas e contextualizadas.
 
-## 🚀 Quick Start
+> Chega de perder horas procurando informações em documentos longos. Basta perguntar.
+
+---
+
+## O que o projeto faz
+
+1. Você faz **upload de um PDF** pela interface
+2. O sistema **processa e indexa** o conteúdo do documento automaticamente
+3. Você **faz perguntas** em português (ou qualquer idioma)
+4. A IA **busca os trechos relevantes** e responde com base no conteúdo real do documento
+5. O histórico de conversas fica salvo e pode ser acessado a qualquer momento
+
+---
+
+## Funcionalidades
+
+- Upload e indexação de PDFs
+- Chat com IA baseado no conteúdo dos documentos (RAG)
+- Histórico de conversas com navegação e exclusão
+- Exclusão de documentos individualmente
+- Modo dark / light
+- Landing page, tela de login e interface de chat
+- Servidor e frontend iniciados com um único comando
+
+---
+
+## Tecnologias utilizadas
+
+| Camada | Tecnologia |
+|---|---|
+| Frontend | React 18, Vite, TypeScript |
+| Backend | Node.js, Express, tRPC v11 |
+| Banco de dados | SQLite + Drizzle ORM |
+| IA (chat) | [Groq](https://console.groq.com) — Llama 3.3 70B |
+| IA (embeddings) | Bag-of-words local (sem API externa) |
+| Extração de PDF | pdf-parse |
+| Build | esbuild (servidor), Vite (frontend) |
+
+---
+
+## Pré-requisitos
+
+- [Node.js](https://nodejs.org) versão **18 ou superior**
+- Uma chave de API do **Groq** (gratuita, sem cartão de crédito)
+
+---
+
+## Como obter a chave do Groq (gratuita)
+
+1. Acesse [console.groq.com](https://console.groq.com)
+2. Crie uma conta (pode usar o Google)
+3. Vá em **API Keys → Create API Key**
+4. Copie a chave gerada (começa com `gsk_...`)
+
+---
+
+## Instalação e configuração
+
+### 1. Clone o repositório
 
 ```bash
-# Instalar dependências
-npm install
-
-# Executar em desenvolvimento
-npm run dev
-
-# Build para produção
-npm run build
-npm start
+git clone https://github.com/BrundoCJ/rag_chatboot.git
+cd rag_chatboot
 ```
 
-## 📋 Requisitos
+### 2. Instale as dependências
 
-- Node.js 18+
-- npm ou yarn
+```bash
+npm install --legacy-peer-deps
+```
 
-## 🛠️ Configuração
+### 3. Configure as variáveis de ambiente
 
-Edite o arquivo `.env` com suas credenciais:
+Copie o arquivo de exemplo e preencha com suas credenciais:
+
+```bash
+cp .env.example .env
+```
+
+Abra o arquivo `.env` e preencha:
 
 ```env
 DATABASE_URL=file:./rag_chatbot.db
-JWT_SECRET=sua_chave_segura
-VITE_APP_ID=seu_app_id
-OAUTH_SERVER_URL=https://api.manus.im
-OWNER_OPEN_ID=seu_owner_id
-BUILT_IN_FORGE_API_URL=https://forge.butterfly-effect.dev
-BUILT_IN_FORGE_API_KEY=sua_chave_forge
+JWT_SECRET=uma_chave_secreta_qualquer_aqui
+
+# Obtenha em https://console.groq.com (gratuito)
+GROQ_API_KEY=sua_chave_groq_aqui
 ```
 
-## 📁 Estrutura do Projeto
+### 4. Crie o banco de dados
+
+```bash
+npx drizzle-kit push
+```
+
+### 5. Inicie o projeto
+
+```bash
+npm run dev:all
+```
+
+Aguarde alguns segundos e acesse: **http://localhost:5173**
+
+---
+
+## Estrutura do projeto
 
 ```
 rag-chatbot/
-├── client/              # Frontend React
+├── client/                  # Frontend React
 │   ├── src/
-│   │   ├── components/  # Componentes React
-│   │   ├── hooks/       # Custom hooks
-│   │   ├── lib/         # Utilidades
-│   │   └── main.tsx     # Entry point
+│   │   ├── pages/
+│   │   │   ├── Landing.tsx  # Página inicial
+│   │   │   ├── Login.tsx    # Tela de login
+│   │   │   └── Chat.tsx     # Interface de chat
+│   │   ├── trpc.ts          # Configuração do cliente tRPC
+│   │   └── main.tsx         # Entry point
 │   └── index.html
-├── server/              # Backend Node.js
-│   ├── _core/           # Configuração core
-│   ├── routers/         # tRPC routers
-│   ├── db.ts            # Database operations
-│   ├── rag.ts           # RAG logic
-│   └── storage.ts       # Storage handling
-├── shared/              # Código compartilhado
-│   ├── const.ts         # Constants
-│   └── _core/           # Utilities
-├── drizzle/             # Drizzle ORM schema
-└── dist/                # Build output
+├── server/                  # Backend Node.js
+│   ├── _core/
+│   │   ├── index.ts         # Entry point do servidor Express
+│   │   ├── trpc.ts          # Configuração do tRPC
+│   │   ├── context.ts       # Contexto das requisições
+│   │   └── env.ts           # Variáveis de ambiente
+│   ├── routers/
+│   │   ├── chat.ts          # Rotas de chat e histórico
+│   │   └── documents.ts     # Rotas de upload e documentos
+│   ├── llm.ts               # Integração com Groq (chat)
+│   ├── rag.ts               # Pipeline RAG + embeddings
+│   └── db.ts                # Operações no banco de dados
+├── drizzle/
+│   └── schema.ts            # Schema do banco de dados
+├── shared/
+│   └── const.ts             # Constantes compartilhadas
+├── .env.example             # Exemplo de configuração
+└── package.json
 ```
 
-## 📚 Tecnologias
+---
 
-- **Frontend**: React 18, Vite, Tailwind CSS, shadcn/ui
-- **Backend**: Express, tRPC, Node.js
-- **Database**: SQLite, Drizzle ORM
-- **IA**: Gemini 2.5 Flash, Embeddings
-- **Auth**: OAuth 2.0, JWT
-- **Storage**: AWS S3 (via Forge API)
+## Scripts disponíveis
 
-## 🔗 APIs Principais
+| Comando | Descrição |
+|---|---|
+| `npm run dev:all` | Compila e inicia backend + frontend juntos |
+| `npm run build:server` | Compila apenas o servidor |
+| `npm run dev` | Inicia apenas o servidor (porta 3000) |
+| `npm run dev:frontend` | Inicia apenas o frontend Vite (porta 5173) |
+| `npx drizzle-kit push` | Cria/atualiza as tabelas no banco |
+| `npx drizzle-kit studio` | Abre o painel visual do banco de dados |
 
-### tRPC Routers
+---
 
-- `/api/trpc/chat.*` - Chat and conversation operations
-- `/api/trpc/admin.*` - Admin dashboard and document upload
-- `/api/trpc/auth.*` - Authentication
-- `/api/trpc/system.*` - System health checks
+## Como usar
 
-### REST Endpoints
+1. **Acesse** http://localhost:5173
+2. **Faça login** com seu nome e e-mail (armazenado localmente, sem senha)
+3. **Faça upload** de um PDF pela barra lateral
+4. Aguarde a mensagem de confirmação (ex: `✓ "documento" indexado (14 trechos)`)
+5. **Faça perguntas** sobre o conteúdo do documento no campo de chat
+6. Use **"Limpar histórico"** para apagar conversas antigas
 
-- `/api/oauth/callback` - OAuth callback
-- `/manus-storage/*` - Storage proxy
+---
 
-## 📖 Documentação
+## Limites do tier gratuito do Groq
 
-Veja [TECHNOLOGIES.md](./TECHNOLOGIES.md) para documentação técnica detalhada.
+| Modelo | Limite gratuito |
+|---|---|
+| Llama 3.3 70B | 30 req/min · 14.400 req/dia |
 
-## 🤝 Contribuindo
+Para uso pessoal e projetos de estudo, os limites gratuitos são mais do que suficientes.
 
-Faça fork, crie uma branch feature, e abra um PR.
+---
 
-## 📝 Licença
+## Licença
 
-MIT
+MIT — sinta-se livre para usar, modificar e distribuir.
