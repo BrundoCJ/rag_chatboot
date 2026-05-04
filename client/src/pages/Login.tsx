@@ -81,7 +81,8 @@ const highlights = [
   { icon: "⚡", text: "Respostas precisas powered by Google Gemini 2.0 Flash" },
 ];
 
-export function Login({ onLogin, onBack }: { onLogin: (user: UserSession) => void; onBack: () => void }) {
+export function Login({ onLogin, onBack, theme, onToggleTheme }: { onLogin: (user: UserSession) => void; onBack: () => void; theme: string; onToggleTheme: () => void }) {
+  const dark = theme === "dark";
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [error, setError] = React.useState("");
@@ -101,10 +102,19 @@ export function Login({ onLogin, onBack }: { onLogin: (user: UserSession) => voi
     boxShadow: focused === field ? "0 0 0 3px rgba(109,40,217,0.12)" : "none",
   });
 
+  const themeBtn: React.CSSProperties = { position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 10, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 18 };
+  const dynCard = { ...S.card, background: dark ? "#1e293b" : "#fff", border: `1px solid ${dark ? "#334155" : "#f1f5f9"}` };
+  const dynCardTitle = { ...S.cardTitle, color: dark ? "#f1f5f9" : "#0f172a" };
+  const dynCardSub = { ...S.cardSub, color: dark ? "#94a3b8" : "#64748b" };
+  const dynLabel = { ...S.label, color: dark ? "#94a3b8" : "#374151" };
+  const dynInput = (field: string) => ({ ...inputStyle(field), background: dark ? "#0f172a" : "#fff", color: dark ? "#f1f5f9" : "#0f172a", borderColor: focused === field ? "#6d28d9" : dark ? "#334155" : "#e2e8f0" });
+  const dynPage = { ...S.page, background: dark ? "linear-gradient(135deg,#0f172a,#1e293b)" : "linear-gradient(135deg,#f8f7ff,#ede9fe,#f0fdf4)" };
+
   return (
-    <div style={S.page}>
+    <div style={dynPage}>
       {/* Left panel */}
-      <div style={S.left}>
+      <div style={{ ...S.left, position: "relative" as const }}>
+        <button style={themeBtn} onClick={onToggleTheme}>{dark ? "☀️" : "🌙"}</button>
         <div style={S.leftInner}>
           <div style={S.logoRow}>
             <div style={S.logoIcon}>🧠</div>
@@ -128,49 +138,30 @@ export function Login({ onLogin, onBack }: { onLogin: (user: UserSession) => voi
       </div>
 
       {/* Right panel */}
-      <div style={S.right}>
-        <div style={S.card}>
+      <div style={{ ...S.right, background: dark ? "#0f172a" : "transparent" }}>
+        <div style={dynCard}>
           <div style={S.cardHeader}>
-            <h1 style={S.cardTitle}>Bem-vindo 👋</h1>
-            <p style={S.cardSub}>Informe seus dados para acessar a plataforma</p>
+            <h1 style={dynCardTitle}>Bem-vindo 👋</h1>
+            <p style={dynCardSub}>Informe seus dados para acessar a plataforma</p>
           </div>
 
           <form onSubmit={handleSubmit} style={S.form}>
             {error && <div style={S.error}>{error}</div>}
 
             <div style={S.fieldGroup}>
-              <label style={S.label}>Seu nome</label>
-              <input
-                style={inputStyle("name")}
-                type="text"
-                placeholder="Ex: João Silva"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onFocus={() => setFocused("name")}
-                onBlur={() => setFocused(null)}
-                autoFocus
-              />
+              <label style={dynLabel}>Seu nome</label>
+              <input style={dynInput("name")} type="text" placeholder="Ex: João Silva" value={name} onChange={(e) => setName(e.target.value)} onFocus={() => setFocused("name")} onBlur={() => setFocused(null)} autoFocus />
             </div>
 
             <div style={S.fieldGroup}>
-              <label style={S.label}>E-mail</label>
-              <input
-                style={inputStyle("email")}
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onFocus={() => setFocused("email")}
-                onBlur={() => setFocused(null)}
-              />
+              <label style={dynLabel}>E-mail</label>
+              <input style={dynInput("email")} type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} onFocus={() => setFocused("email")} onBlur={() => setFocused(null)} />
             </div>
 
-            <button type="submit" style={S.submit}>
-              Acessar a plataforma →
-            </button>
+            <button type="submit" style={S.submit}>Acessar a plataforma →</button>
           </form>
 
-          <p style={S.backLink} onClick={onBack}>← Voltar para a página inicial</p>
+          <p style={{ ...S.backLink, color: dark ? "#a5b4fc" : "#6d28d9" }} onClick={onBack}>← Voltar para a página inicial</p>
         </div>
       </div>
     </div>

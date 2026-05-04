@@ -5,6 +5,7 @@ import {
   updateDocument,
   listDocuments,
   replaceDocumentChunks,
+  deleteDocument,
 } from "../db";
 import { processPdfDocument } from "../rag";
 
@@ -69,5 +70,12 @@ export const documentsRouter = router({
         });
         throw error;
       }
+    }),
+
+  delete: publicProcedure
+    .input(z.object({ documentId: z.number() }))
+    .mutation(async ({ input }) => {
+      await deleteDocument(input.documentId);
+      return { ok: true };
     }),
 });

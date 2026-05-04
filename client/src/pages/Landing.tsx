@@ -96,7 +96,7 @@ const S = {
 
   // Features
   features: {
-    padding: "80px 5%", background: "#ffffff",
+    padding: "80px 5%",
     maxWidth: 1100, margin: "0 auto",
   } as React.CSSProperties,
   sectionLabel: {
@@ -209,73 +209,80 @@ const steps = [
   { title: "Receba respostas baseadas nos documentos", text: "A IA busca as informações certas e responde com precisão e contexto." },
 ];
 
-export function Landing({ onLogin }: { onLogin: () => void }) {
+export function Landing({ onLogin, theme, onToggleTheme }: { onLogin: () => void; theme: string; onToggleTheme: () => void }) {
+  const dark = theme === "dark";
+  const dynPage = { ...S.page, background: dark ? "#0f172a" : "#fff" };
+  const dynNav = { ...S.nav, background: dark ? "rgba(15,23,42,0.9)" : "rgba(255,255,255,0.85)", borderBottom: `1px solid ${dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)"}` };
+  const dynLogoText = { ...S.logoText, color: dark ? "#f1f5f9" : "#0f172a" };
+  const dynHeroTitle = { ...S.heroTitle, color: dark ? "#f1f5f9" : "#0f172a" };
+  const dynHeroSub = { ...S.heroSub, color: dark ? "#94a3b8" : "#64748b" };
+  const dynFeatureCard = { ...S.featureCard, background: dark ? "#1e293b" : "#f8f7ff", border: `1px solid ${dark ? "#334155" : "#ede9fe"}` };
+  const dynFeatureTitle = { ...S.featureTitle, color: dark ? "#f1f5f9" : "#0f172a" };
+  const dynFeatureText = { ...S.featureText, color: dark ? "#94a3b8" : "#64748b" };
+  const dynSectionTitle = { ...S.sectionTitle, color: dark ? "#f1f5f9" : "#0f172a" };
+  const dynStepsSection = { ...S.stepsSection, background: dark ? "#0f172a" : "#f8f7ff" };
+  const dynStepCard = { ...S.stepCard, background: dark ? "#1e293b" : "#fff", boxShadow: dark ? "none" : "0 2px 12px rgba(0,0,0,0.06)", border: dark ? "1px solid #334155" : "none" };
+  const dynStepTitle = { ...S.stepTitle, color: dark ? "#f1f5f9" : "#0f172a" };
+  const dynStepText = { ...S.stepText, color: dark ? "#94a3b8" : "#64748b" };
+  const dynFooter = { ...S.footer, borderTop: `1px solid ${dark ? "#1e293b" : "#f1f5f9"}` };
+
+  const themeBtn: React.CSSProperties = { background: dark ? "#1e293b" : "#f1f5f9", border: `1px solid ${dark ? "#334155" : "#e2e8f0"}`, borderRadius: 10, width: 38, height: 38, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 18 };
+
   return (
-    <div style={S.page}>
+    <div style={dynPage}>
       {/* Navbar */}
-      <nav style={S.nav}>
+      <nav style={dynNav}>
         <div style={S.logo}>
           <div style={S.logoIcon}>🧠</div>
-          <span style={S.logoText}>DocMind AI</span>
+          <span style={dynLogoText}>DocMind AI</span>
         </div>
-        <button style={S.navBtn} onClick={onLogin}>Entrar na plataforma →</button>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <button style={themeBtn} onClick={onToggleTheme}>{dark ? "☀️" : "🌙"}</button>
+          <button style={S.navBtn} onClick={onLogin}>Entrar na plataforma →</button>
+        </div>
       </nav>
 
       {/* Hero */}
-      <section style={S.hero}>
-        <div style={S.heroBadge}>✨ Powered by Google Gemini 2.0 Flash</div>
-        <h1 style={S.heroTitle}>
+      <section style={{ ...S.hero, background: dark ? "linear-gradient(180deg,#0f172a 0%,#0f172a 100%)" : "linear-gradient(180deg,#f8f7ff 0%,#ffffff 100%)" }}>
+        <div style={S.heroBadge}>✨ Powered by Llama 3.3 · Groq</div>
+        <h1 style={dynHeroTitle}>
           Converse com seus{" "}
           <span style={S.heroHighlight}>documentos</span>
           {" "}usando IA
         </h1>
-        <p style={S.heroSub}>
+        <p style={dynHeroSub}>
           Faça perguntas sobre seus PDFs e receba respostas precisas em segundos.
           Chega de perder horas procurando informações em documentos longos.
         </p>
         <div style={S.heroCta}>
-          <button style={S.ctaPrimary} onClick={onLogin}>
-            Começar gratuitamente
-          </button>
-          <button style={S.ctaSecondary} onClick={onLogin}>
-            Ver demonstração
-          </button>
+          <button style={S.ctaPrimary} onClick={onLogin}>Começar gratuitamente</button>
+          <button style={{ ...S.ctaSecondary, borderColor: dark ? "#334155" : "#e0e7ff", color: dark ? "#a5b4fc" : "#4f46e5" }} onClick={onLogin}>Ver demonstração</button>
         </div>
-
-        {/* Preview */}
         <div style={S.previewWrap}>
           <div style={S.previewCard}>
             <div style={S.previewBar}>
-              <div style={S.dot("#ef4444")} />
-              <div style={S.dot("#f59e0b")} />
-              <div style={S.dot("#22c55e")} />
+              <div style={S.dot("#ef4444")} /><div style={S.dot("#f59e0b")} /><div style={S.dot("#22c55e")} />
             </div>
             <div style={S.previewChat}>
-              <div style={S.previewMsg(false)}>
-                👋 Olá! Faça upload de um PDF e comece a fazer perguntas.
-              </div>
-              <div style={S.previewMsg(true)}>
-                Qual é o prazo de entrega previsto no contrato?
-              </div>
-              <div style={S.previewMsg(false)}>
-                📄 Com base no <strong>Contrato_Fornecimento.pdf</strong>, o prazo de entrega previsto é de <strong>30 dias úteis</strong> a partir da assinatura, conforme cláusula 4.2.
-              </div>
+              <div style={S.previewMsg(false)}>👋 Olá! Faça upload de um PDF e comece a fazer perguntas.</div>
+              <div style={S.previewMsg(true)}>Qual é o prazo de entrega previsto no contrato?</div>
+              <div style={S.previewMsg(false)}>📄 Com base no <strong>Contrato_Fornecimento.pdf</strong>, o prazo é de <strong>30 dias úteis</strong>, conforme cláusula 4.2.</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section style={{ background: "#fff", padding: "80px 0" }}>
+      <section style={{ background: dark ? "#0f172a" : "#fff", padding: "80px 0" }}>
         <div style={S.features}>
           <p style={S.sectionLabel}>Funcionalidades</p>
-          <h2 style={S.sectionTitle}>Tudo que você precisa em um só lugar</h2>
+          <h2 style={dynSectionTitle}>Tudo que você precisa em um só lugar</h2>
           <div style={S.grid3}>
             {features.map((f) => (
-              <div key={f.title} style={S.featureCard}>
+              <div key={f.title} style={dynFeatureCard}>
                 <div style={S.featureIcon}>{f.icon}</div>
-                <h3 style={S.featureTitle}>{f.title}</h3>
-                <p style={S.featureText}>{f.text}</p>
+                <h3 style={dynFeatureTitle}>{f.title}</h3>
+                <p style={dynFeatureText}>{f.text}</p>
               </div>
             ))}
           </div>
@@ -283,17 +290,17 @@ export function Landing({ onLogin }: { onLogin: () => void }) {
       </section>
 
       {/* Steps */}
-      <section style={S.stepsSection}>
+      <section style={dynStepsSection}>
         <div style={S.stepsInner}>
           <p style={S.sectionLabel}>Como funciona</p>
-          <h2 style={S.sectionTitle}>Em 4 passos simples</h2>
+          <h2 style={dynSectionTitle}>Em 4 passos simples</h2>
           <div style={S.stepsList}>
             {steps.map((s, i) => (
-              <div key={i} style={S.stepCard}>
+              <div key={i} style={dynStepCard}>
                 <div style={S.stepNum}>{i + 1}</div>
                 <div>
-                  <h4 style={S.stepTitle}>{s.title}</h4>
-                  <p style={S.stepText}>{s.text}</p>
+                  <h4 style={dynStepTitle}>{s.title}</h4>
+                  <p style={dynStepText}>{s.text}</p>
                 </div>
               </div>
             ))}
@@ -315,10 +322,10 @@ export function Landing({ onLogin }: { onLogin: () => void }) {
       </div>
 
       {/* Footer */}
-      <footer style={S.footer}>
+      <footer style={{ ...dynFooter, color: dark ? "#475569" : "#94a3b8" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 20 }}>🧠</span>
-          <span style={{ fontWeight: 600, color: "#475569" }}>DocMind AI</span>
+          <span style={{ fontWeight: 600, color: dark ? "#64748b" : "#475569" }}>DocMind AI</span>
         </div>
         <span>© 2026 DocMind AI — Todos os direitos reservados</span>
       </footer>

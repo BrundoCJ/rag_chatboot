@@ -403,3 +403,34 @@ export async function listRagEvents() {
     .from(schema.ragEvents)
     .orderBy(desc(schema.ragEvents.createdAt));
 }
+
+// Delete operations
+export async function deleteConversation(conversationId: string, sessionId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(schema.conversations)
+    .where(
+      and(
+        eq(schema.conversations.id, conversationId),
+        eq(schema.conversations.sessionId, sessionId)
+      )
+    );
+}
+
+export async function clearAllConversations(sessionId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(schema.conversations)
+    .where(eq(schema.conversations.sessionId, sessionId));
+}
+
+export async function deleteDocument(documentId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(schema.documents).where(eq(schema.documents.id, documentId));
+}

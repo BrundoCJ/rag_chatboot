@@ -7,6 +7,8 @@ import {
   listMessagesForConversation,
   getConversationForSession,
   updateConversationAfterMessage,
+  deleteConversation,
+  clearAllConversations,
 } from "../db";
 import { findRelevantChunks, buildContextFromChunks } from "../rag";
 import { generateChatResponse } from "../llm";
@@ -102,5 +104,19 @@ export const chatRouter = router({
       );
       if (!conversation) return [];
       return listMessagesForConversation(input.conversationId);
+    }),
+
+  deleteConversation: publicProcedure
+    .input(z.object({ conversationId: z.string(), sessionId: z.string() }))
+    .mutation(async ({ input }) => {
+      await deleteConversation(input.conversationId, input.sessionId);
+      return { ok: true };
+    }),
+
+  clearHistory: publicProcedure
+    .input(z.object({ sessionId: z.string() }))
+    .mutation(async ({ input }) => {
+      await clearAllConversations(input.sessionId);
+      return { ok: true };
     }),
 });
