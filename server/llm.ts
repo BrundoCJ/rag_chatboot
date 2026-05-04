@@ -1,16 +1,26 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { ENV } from "./_core/env";
 
-const genAI = new GoogleGenerativeAI(ENV.geminiApiKey);
+const groq = new Groq({ apiKey: ENV.groqApiKey });
 
-const chatModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
-const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
+export const EMBEDDING_MODEL = "local-bow-512";
 
-export const EMBEDDING_MODEL = "gemini-embedding-001";
+// Embedding local via bag-of-words com hashing — sem custo de API
+export function generateEmbedding(text: string): number[] {
+  const DIMS = 512;
+  const vec = new Array(DIMS).fill(0);
+  const words = text.toLowerCase().match(/\w+/g) ?? [];
 
-export async function generateEmbedding(text: string): Promise<number[]> {
-  const result = await embeddingModel.embedContent(text);
-  return result.embedding.values;
+  for (const word of words) {
+    let hash = 5381;
+    for (let i = 0; i < word.length; i++) {
+      hash = ((hash << 5) + hash + word.charCodeAt(i)) & 0x7fffffff;
+    }
+    vec[hash % DIMS] += 1;
+  }
+
+  const mag = Math.sqrt(vec.reduce((s, v) => s + v * v, 0));
+  return mag === 0 ? vec : vec.map((v) => v / mag);
 }
 
 export async function generateChatResponse(
@@ -27,17 +37,21 @@ ${context}
 ---`
     : "Você é um assistente prestativo. Responda de forma clara e objetiva.";
 
-  const chat = chatModel.startChat({
-    history: [
-      { role: "user", parts: [{ text: systemPrompt }] },
-      { role: "model", parts: [{ text: "Entendido! Vou usar o contexto fornecido para responder suas perguntas." }] },
-      ...history.map((msg) => ({
-        role: msg.role,
-        parts: [{ text: msg.parts }],
-      })),
-    ],
+  const messages: Groq.Chat.ChatCompletionMessageParam[] = [
+    { role: "system", content: systemPrompt },
+    ...history.map((msg) => ({
+      role: msg.role === "model" ? ("assistant" as const) : ("user" as const),
+      content: msg.parts,
+    })),
+    { role: "user", content: userMessage },
+  ];
+
+  const response = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages,
+    temperature: 0.7,
+    max_tokens: 1024,
   });
 
-  const result = await chat.sendMessage(userMessage);
-  return result.response.text();
+  return response.choices[0]?.message?.content ?? "Sem resposta.";
 }

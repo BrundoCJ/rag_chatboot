@@ -60,6 +60,7 @@
     "drizzle-orm": "^0.31.3",
     "express": "^4.18.2",
     "framer-motion": "^10.16.4",
+    "groq-sdk": "^1.1.2",
     "jose": "^5.4.1",
     "lucide-react": "^0.383.0",
     "pdf-parse": "^1.1.1",

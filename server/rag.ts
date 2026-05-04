@@ -14,7 +14,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 export async function findRelevantChunks(query: string, topK = 5) {
-  const queryEmbedding = await generateEmbedding(query);
+  const queryEmbedding = generateEmbedding(query);
   const candidates = await listReadyChunkCandidates();
 
   if (candidates.length === 0) return [];
@@ -54,7 +54,7 @@ export async function processPdfDocument(
   const result = [];
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
-    const embedding = await generateEmbedding(chunk);
+    const embedding = generateEmbedding(chunk);
     result.push({
       chunkIndex: i,
       content: chunk,
